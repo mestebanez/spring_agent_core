@@ -1,0 +1,15 @@
+spring:
+  ai:
+    bedrock:
+      aws:
+        region: eu-west-1
+      converse:
+        chat:
+          options:
+            model: nvidia.nemotron-nano-12b-v2
+server:
+  port: 8080
+
+mcp:
+  disable: true
+

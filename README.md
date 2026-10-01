@@ -1,0 +1,1 @@
+url -G http://localhost:8080/agent --data-urlencode "q=Explore the knowledge_search for Paris"
