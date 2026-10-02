@@ -1,17 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AgentCore Runtime for Spring AI Agent
+Description: Spring AI Agent deployed to Amazon Bedrock AgentCore Runtime
 
 Parameters:
+
   ImageUri:
     Type: String
-    Description: ECR image URI
+    Description: ECR image URI containing the Spring Boot agent
+
 Resources:
-  AgentExecutionRole:
+
+  AgentRuntimeRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: spring-agent-runtime-role
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -24,30 +26,27 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonBedrockFullAccess
 
   AgentRuntime:
+
     Type: AWS::BedrockAgentCore::Runtime
+
     Properties:
-      RuntimeName: spring-ai-agent
 
-      RuntimeConfiguration:
-        Container:
-          ImageUri: !Ref ImageUri
+      AgentRuntimeName: springaiagent
 
-      ExecutionRoleArn: !Ref AgentExecutionRole.Arn
+      RoleArn: !GetAtt AgentRuntimeRole.Arn
 
-      NetworkConfiguration:
-        PublicAccess: true
-
-  AgentEndpoint:
-    Type: AWS::BedrockAgentCore::RuntimeEndpoint
-    Properties:
-      RuntimeIdentifier: !Ref AgentRuntime
-      EndpointName: spring-ai-agent-endpoint
-
+      EnvironmentVariables:
+        MCP_DISABLE: false
+        
+      AgentRuntimeArtifact:
+        ContainerConfiguration:
+          ContainerUri: !Ref ImageUri
 Outputs:
 
-  RuntimeId:
-    Value: !Ref AgentRuntime
+  RuntimeArn:
+    Description: Runtime ARN
+    Value: !GetAtt AgentRuntime.AgentRuntimeArn
 
-  EndpointId:
-    Value: !Ref AgentEndpoint
-  `
+  RuntimeId:
+    Description: Runtime identifier
+    Value: !Ref AgentRuntime
