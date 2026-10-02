@@ -4,7 +4,7 @@ import com.example.agent.service.SupportAgent;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/agent")
+@RequestMapping("/invocations")
 public class AgentController {
     private final SupportAgent agent;
 
@@ -16,4 +16,11 @@ public class AgentController {
     public String ask(@RequestParam String q) {
         return agent.ask(q);
     }
+
+    @PostMapping
+    public String invoke(@RequestBody PromptRequest request) {
+        return agent.ask(request.prompt());
+    }
+
+    record PromptRequest(String prompt) {}
 }
