@@ -32,7 +32,7 @@ phases:
       - mvn clean package -DskipTests
 
       - echo Building Docker image...
-      - docker buildx --platform linux/arm64 -t $IMAGE_REPO_NAME:$IMAGE_TAG --push .
+      - docker buildx build --platform linux/arm64 -t $IMAGE_REPO_NAME:$IMAGE_TAG --push .
 
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
 
