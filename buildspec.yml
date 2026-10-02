@@ -1,0 +1,41 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_REPO_NAME: spring-agent
+    IMAGE_TAG: latest
+
+phases:
+  install:
+    commands:
+      - echo "Checking Maven..."
+      - mvn -version || yum install -y maven
+
+  pre_build:
+    commands:
+      - echo Logging into ECR...
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.eu-west-1.amazonaws.com/$IMAGE_REPO_NAME
+
+      - aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.eu-west-1.amazonaws.com
+
+  build:
+    commands:
+      - echo Building Spring application...
+      - mvn clean package -DskipTests
+
+      - echo Building Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker push $ECR_URI:$IMAGE_TAG
+
+      - echo Build completed successfully
+
+artifacts:
+  files:
+    - '**/*'
