@@ -36,11 +36,13 @@ Resources:
       RoleArn: !GetAtt AgentRuntimeRole.Arn
 
       EnvironmentVariables:
-        MCP_DISABLE: false
-        
+        MCP_DISABLE: "true"
+
       AgentRuntimeArtifact:
         ContainerConfiguration:
           ContainerUri: !Ref ImageUri
+      NetworkConfiguration:
+        NetworkMode: PUBLIC
 Outputs:
 
   RuntimeArn:
